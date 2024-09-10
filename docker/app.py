@@ -8,6 +8,7 @@ CORS(app)
 
 PG_MAJOR = '16'
 
+
 def exec(command):
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = process.communicate()
@@ -25,18 +26,17 @@ def api_exec():
         return jsonify({'output': output.decode('utf-8'), 'error': error.decode('utf-8')})
     else:
         return jsonify({'error': 'Invalid token'})
-    
 
-@app.route('/ping', methods=['POST'])
+
+@app.route('/ping', methods=['GET', 'POST'])
 def api_ping():
-    return jsonify({'message': 'pong'})
+    return "pong"
 
 
 def init_postgresql(pgdata):
     exec(f'su -c "pg_ctl -D {pgdata} initdb" postgres')
 
 
-    
 def start_postgresql(pgdata, pglog):
     exec(f'su -c "pg_ctl -D {pgdata} -l {pglog} start" postgres')
 
@@ -60,8 +60,8 @@ if __name__ == '__main__':
     if not os.listdir(costum_pg_data_dir):
         init_postgresql(costum_pg_data_dir)
     start_postgresql(costum_pg_data_dir, costum_pg_log_file)
+    exec_sql("ALTER SYSTEM SET listen_addresses TO '*'")
     app.run(host='0.0.0.0', port=54323, debug=False)
-
 
 """
 3FPF1wL6Xsve25zkYkkeYjJ8Ywd2RAvXJx59imb5

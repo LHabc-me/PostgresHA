@@ -78,6 +78,7 @@ sudo docker run -d \
                 -v /postgres-ha/data:/postgres-ha/data \
                 -v /postgres-ha/log:/postgres-ha/log \
                 -e TOKEN=$TOKEN \
+                --restart=unless-stopped \
                 $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VERSION
 
 echo "Done."

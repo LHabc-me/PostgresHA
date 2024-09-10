@@ -29,13 +29,17 @@ ENV POSTGRES_HA_ROOT=/postgres-ha
 ENV POSTGRES_HA_SERVICE_DIR=${POSTGRES_HA_ROOT}/service
 ENV POSTGRES_HA_DATA_DIR=${POSTGRES_HA_ROOT}/data
 ENV POSTGRES_HA_LOG_DIR=${POSTGRES_HA_ROOT}/log
+ENV POSTGRES_HA_SERVICE_PORT=54323
 
 RUN apt-get install -y --no-install-recommends \
-    python3 python3-pip python3-venv && \
+    python3 python3-pip python3-venv curl && \
     mkdir -p ${POSTGRES_HA_SERVICE_DIR} && \
     python3 -m venv ${POSTGRES_HA_SERVICE_DIR}/venv && \
     ${POSTGRES_HA_SERVICE_DIR}/venv/bin/pip install flask flask-cors psycopg2-binary
 
 COPY ./app.py ${POSTGRES_HA_SERVICE_DIR}/app.py
+
+HEALTHCHECK --interval=5s --timeout=5s --retries=3 \
+CMD curl --fail http://localhost:${POSTGRES_HA_SERVICE_PORT}/ping || exit 1
     
 CMD ["sh", "-c", "${POSTGRES_HA_SERVICE_DIR}/venv/bin/python ${POSTGRES_HA_SERVICE_DIR}/app.py"]
